@@ -1,6 +1,6 @@
 package pl.filipwlodarczyk.SPRINGSECURITY.security;
 
-public enum ApplicationPermissions {
+public enum ApplicationPermission {
     STUDENT_READ("student:read"),
     STUDENT_WRITE("student:write"),
     COURSE_READ("course:read"),
@@ -8,7 +8,7 @@ public enum ApplicationPermissions {
 
     private final String permission;
 
-    ApplicationPermissions(String permission) {
+    ApplicationPermission(String permission) {
         this.permission = permission;
     }
 

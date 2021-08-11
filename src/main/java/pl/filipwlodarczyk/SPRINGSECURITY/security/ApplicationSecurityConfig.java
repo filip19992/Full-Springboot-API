@@ -12,13 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.util.AntPathMatcher;
 
 import java.util.concurrent.TimeUnit;
 
-import static pl.filipwlodarczyk.SPRINGSECURITY.security.ApplicationRoles.*;
+import static pl.filipwlodarczyk.SPRINGSECURITY.security.ApplicationRole.*;
 
 @Configuration
 @EnableWebSecurity
@@ -71,21 +69,21 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .username("Filip")
                 .password(passwordEncoder.encode("password"))
 //                .roles(ADMIN.name())
-                .authorities(ADMIN.getGrantedAuthority())
+                .authorities(ADMIN.getGrantedAuthorities())
                 .build();
 
         UserDetails kubaAdminTrainee = User.builder()
                 .username("Kuba")
                 .password(passwordEncoder.encode("password"))
 //                .roles(ADMINTRAINEE.name())
-                .authorities(ADMINTRAINEE.getGrantedAuthority())
+                .authorities(ADMINTRAINEE.getGrantedAuthorities())
                 .build();
 
         UserDetails maciekPatient = User.builder()
                 .username("Maciek")
                 .password(passwordEncoder.encode("password"))
 //                .roles(STUDENT.name())
-                .authorities(STUDENT.getGrantedAuthority())
+                .authorities(STUDENT.getGrantedAuthorities())
                 .build();
         return new InMemoryUserDetailsManager(
                 filipAdmin,

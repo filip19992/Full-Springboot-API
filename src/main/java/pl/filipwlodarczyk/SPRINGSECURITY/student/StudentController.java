@@ -32,7 +32,7 @@ public class StudentController {
     @GetMapping(path = "{studentId}")
     public Student getStudent(@PathVariable("studentId") Long studentId) {
         return STUDENTS.stream()
-                .filter(patient -> studentId.equals(patient.getStudentId()))
+                .filter(student -> studentId.equals(student.getStudentId()))
                 .findFirst()
                 .orElseThrow(
                         () -> new IllegalStateException("Student with id " + studentId + " is not found"
