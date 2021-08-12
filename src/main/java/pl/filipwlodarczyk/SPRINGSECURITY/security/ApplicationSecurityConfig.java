@@ -1,18 +1,18 @@
 package pl.filipwlodarczyk.SPRINGSECURITY.security;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import pl.filipwlodarczyk.SPRINGSECURITY.auth.ApplicationUserService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,9 +24,12 @@ import static pl.filipwlodarczyk.SPRINGSECURITY.security.ApplicationRole.*;
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationUserService applicationUserService;
 
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder) {
+    @Autowired
+    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserDao) {
         this.passwordEncoder = passwordEncoder;
+        this.applicationUserService = applicationUserDao;
     }
 
     @Override
@@ -35,7 +38,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
 
                 .authorizeRequests()
-                .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
+                .antMatchers("/", "index", "/css/*", "/js/*","main.css", "/images/*","herringbone").permitAll()
                 .antMatchers("/api/**").hasRole(STUDENT.name())
                 .anyRequest()
                 .authenticated()
@@ -63,34 +66,16 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    @Bean
-    protected UserDetailsService userDetailsService() {
-        UserDetails filipAdmin = User.builder()
-                .username("Filip")
-                .password(passwordEncoder.encode("password"))
-//                .roles(ADMIN.name())
-                .authorities(ADMIN.getGrantedAuthorities())
-                .build();
-
-        UserDetails kubaAdminTrainee = User.builder()
-                .username("Kuba")
-                .password(passwordEncoder.encode("password"))
-//                .roles(ADMINTRAINEE.name())
-                .authorities(ADMINTRAINEE.getGrantedAuthorities())
-                .build();
-
-        UserDetails maciekPatient = User.builder()
-                .username("Maciek")
-                .password(passwordEncoder.encode("password"))
-//                .roles(STUDENT.name())
-                .authorities(STUDENT.getGrantedAuthorities())
-                .build();
-        return new InMemoryUserDetailsManager(
-                filipAdmin,
-                maciekPatient,
-                kubaAdminTrainee
-        );
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProvider());
     }
 
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(applicationUserService);
+        return provider;
+    }
 
 }
