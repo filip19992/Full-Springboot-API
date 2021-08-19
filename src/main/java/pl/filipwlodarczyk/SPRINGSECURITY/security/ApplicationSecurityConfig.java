@@ -10,9 +10,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import pl.filipwlodarczyk.SPRINGSECURITY.auth.ApplicationUserService;
+import pl.filipwlodarczyk.SPRINGSECURITY.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -36,33 +38,39 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
                 .authorizeRequests()
-                .antMatchers("/", "index", "/css/*", "/js/*","main.css", "/images/*","herringbone").permitAll()
+                .antMatchers("/", "index", "/css/*", "/js/*","main.css", "/images/**",
+                        "src/main/java/pl/filipwlodarczyk/SPRINGSECURITY/resources/images/backimg.jpg").permitAll()
                 .antMatchers("/api/**").hasRole(STUDENT.name())
                 .anyRequest()
-                .authenticated()
-                .and()
+                .authenticated();
 
-                .formLogin()
-                .usernameParameter("username")
-                .passwordParameter("password")
-                .loginPage("/login").permitAll().defaultSuccessUrl("/courses", true)
-                .and()
+            //  !!!    PREVIOUS VERSION WITH FORMLOGIN   !!!
 
-                .rememberMe()
-                    .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))//default to 2 weeks
-                    .key("something secured")
-                    .rememberMeParameter("remember-me")
-                .and()
-
-                .logout()
-                    .logoutUrl("/logout")
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
-                    .clearAuthentication(true)
-                    .invalidateHttpSession(true)
-                    .deleteCookies("remember-me", "JSESSIONID", "XSRF-TOKEN", "io", "Idea-2af19c64")
-                    .logoutSuccessUrl("/login");
+//                .and()
+//                .formLogin()
+//                .usernameParameter("username")
+//                .passwordParameter("password")
+//                .loginPage("/login").permitAll().defaultSuccessUrl("/courses", true)
+//                .and()
+//
+//                .rememberMe()
+//                    .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))//default to 2 weeks
+//                    .key("something secured")
+//                    .rememberMeParameter("remember-me")
+//                .and()
+//
+//                .logout()
+//                    .logoutUrl("/logout")
+//                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+//                    .clearAuthentication(true)
+//                    .invalidateHttpSession(true)
+//                    .deleteCookies("remember-me", "JSESSIONID", "XSRF-TOKEN", "io", "Idea-2af19c64")
+//                    .logoutSuccessUrl("/login");
     }
 
     @Override

@@ -1,6 +1,6 @@
 body
 {
-background-image: url("images/herringbone.png");
+background-image:url("src/main/java/pl/filipwlodarczyk/SPRINGSECURITY/resources/images/backimg.jpg")
 background-color: gray;
 margin:0;
 }
