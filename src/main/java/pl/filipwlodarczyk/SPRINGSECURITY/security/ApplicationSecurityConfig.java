@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import pl.filipwlodarczyk.SPRINGSECURITY.auth.ApplicationUserService;
+import pl.filipwlodarczyk.SPRINGSECURITY.jwt.JwtTokenVerifier;
 import pl.filipwlodarczyk.SPRINGSECURITY.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 
 import java.util.concurrent.TimeUnit;
@@ -42,6 +43,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(new JwtTokenVerifier(), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*","main.css", "/images/**",
                         "src/main/java/pl/filipwlodarczyk/SPRINGSECURITY/resources/images/backimg.jpg").permitAll()
